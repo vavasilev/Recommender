@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+    id 'eclipse'
+    id 'com.gradle.build-scan' version '2.0.2'
+    id 'org.springframework.boot' version '2.0.5.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.7.RELEASE'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://repo.spring.io/libs-snapshot'
+    }
+}
+
+
+sourceCompatibility = 1.11
+targetCompatibility = 1.11
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-dependencies:2.0.5.RELEASE'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.shell:spring-shell-starter:2.0.1.BUILD-SNAPSHOT'
+    compile 'commons-validator:commons-validator:1.4.0'
+    compile 'org.apache.commons:commons-lang3:3.9'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    components {
+        withModule('org.springframework:spring-beans') {
+            allVariants {
+                withDependencyConstraints {
+                    // Need to patch constraints because snakeyaml is an optional dependency
+                    it.findAll { it.name == 'snakeyaml' }.each { it.version { strictly '1.19' } }
+                }
+            }
+        }
+    }
+}
+
+bootJar {
+    mainClassName = 'recommender.RecommenderApp'
+}
